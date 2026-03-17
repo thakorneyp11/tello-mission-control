@@ -5,6 +5,9 @@ services:
     env_file: .env
     ports:
       - "${TELLO_API_PORT:-8000}:8000"
+      - "8889:8889/udp"   # Tello control
+      - "8890:8890/udp"   # Tello state
+      - "11111:11111/udp" # Tello video stream
     restart: unless-stopped
 
   frontend:
