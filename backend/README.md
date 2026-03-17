@@ -74,14 +74,47 @@ curl -X POST http://localhost:8000/api/control/emergency
 wscat -c ws://localhost:8000/api/ws/telemetry
 ```
 
-You'll see JSON frames at ~4Hz with battery, height, flight time, and temperature.
+You'll see JSON telemetry frames at ~4Hz:
+
+```json
+{
+  "type": "telemetry",
+  "data": {
+    "battery": 85,
+    "height": 120,
+    "flight_time": 42,
+    "temperature": { "high": 65, "low": 60 },
+    "attitude": { "pitch": 2, "roll": -1, "yaw": 180 },
+    "speed": { "x": 0, "y": 10, "z": 0 },
+    "barometer": 150.5,
+    "tof_distance": 120
+  },
+  "timestamp": "2026-03-17T10:30:00.123Z"
+}
+```
+
+Command log events are also pushed over the same connection:
+
+```json
+{
+  "type": "command_log",
+  "data": {
+    "command": "move",
+    "params": { "direction": "forward", "distance_cm": 100 },
+    "result": "ok",
+    "timestamp": "2026-03-17T10:30:01.456Z"
+  }
+}
+```
+
+**Tip:** While the WebSocket is open, trigger commands in another terminal to see telemetry values update in real time (e.g. `takeoff` → height changes, `rotate` → yaw changes).
 
 ## Running Tests
 
 ```bash
 cd backend
 source .venv/bin/activate
-python -m pytest -v                          # All 36 tests
+python -m pytest -v                          # All 54 tests
 python -m pytest tests/test_drone_manager.py # Unit tests only
 python -m pytest tests/test_control.py       # API integration tests only
 python -m pytest tests/test_telemetry.py     # WebSocket tests only
@@ -122,7 +155,7 @@ docker compose up --build
 
 | Path | Description |
 |------|-------------|
-| `WS /api/ws/telemetry` | Pushes telemetry frames (~4Hz) and command log events |
+| `WS /api/ws/telemetry` | Pushes telemetry frames (~4Hz) with `{battery, height, flight_time, temperature{high,low}, attitude{pitch,roll,yaw}, speed{x,y,z}, barometer, tof_distance}` and command log events |
 
 ### Allowed Values
 

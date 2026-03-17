@@ -3,11 +3,32 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
+class TemperatureData(BaseModel):
+    high: float
+    low: float
+
+
+class AttitudeData(BaseModel):
+    pitch: int
+    roll: int
+    yaw: int
+
+
+class SpeedData(BaseModel):
+    x: int
+    y: int
+    z: int
+
+
 class TelemetryData(BaseModel):
     battery: int
     height: int  # cm
     flight_time: int  # seconds
-    temperature: float  # celsius
+    temperature: TemperatureData
+    attitude: AttitudeData
+    speed: SpeedData
+    barometer: float
+    tof_distance: int  # cm
 
 
 class TelemetryFrame(BaseModel):

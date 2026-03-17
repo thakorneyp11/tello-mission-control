@@ -15,14 +15,15 @@ export default function HudLayout() {
   return (
     <>
       <div
-        className="fixed inset-0 z-[2] grid pointer-events-none p-4 gap-3"
+        className="fixed inset-0 z-[2] grid pointer-events-none"
         style={{
-          gridTemplateColumns: '220px 1fr 280px',
-          gridTemplateRows: 'auto 1fr auto',
+          padding: 'clamp(8px, 1vw, 16px)',
+          gap: 'clamp(4px, 0.5vw, 8px)',
+          gridTemplateColumns: 'minmax(180px, 220px) 1fr minmax(200px, 260px)',
+          gridTemplateRows: 'auto 1fr',
           gridTemplateAreas: `
-            "telemetry  .        status"
-            "telemetry  .        cmdlog"
-            "controls   actions  ."
+            "telemetry  .  status"
+            "controls   .  ."
           `,
         }}
       >
@@ -30,28 +31,27 @@ export default function HudLayout() {
           <TelemetryPanel />
         </div>
 
-        <div className="pointer-events-auto self-start justify-self-end" style={{ gridArea: 'status' }}>
+        {/* StatusBar + CommandLog stacked together in top-right */}
+        <div className="pointer-events-auto self-start justify-self-end flex flex-col gap-2" style={{ gridArea: 'status' }}>
           <StatusBar />
-        </div>
-
-        <div className="pointer-events-auto self-start" style={{ gridArea: 'cmdlog' }}>
           <CommandLog />
         </div>
 
         <div className="pointer-events-auto self-end" style={{ gridArea: 'controls' }}>
           <FlightControls />
         </div>
+      </div>
 
-        <div className="pointer-events-auto self-end justify-self-center" style={{ gridArea: 'actions' }}>
-          <ActionButtons onOpenSequences={() => setSequenceModalOpen(true)} />
-        </div>
+      {/* Action buttons — fixed bottom-center, outside grid */}
+      <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-[2] pointer-events-auto sm:bottom-5">
+        <ActionButtons onOpenSequences={() => setSequenceModalOpen(true)} />
       </div>
 
       <SequenceModal
         isOpen={sequenceModalOpen}
         onClose={() => setSequenceModalOpen(false)}
         onSelect={(id) => {
-          sendCommand(() => api.runSequence(id), `RUN SEQUENCE ${id}`);
+          sendCommand(() => api.runSequence(id));
         }}
       />
     </>

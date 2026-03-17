@@ -53,11 +53,12 @@ export interface ConnectResponse {
 export interface StatusResponse {
   connected: boolean;
   flying: boolean;
+  streaming: boolean;
   battery: number;
 }
 
 export interface WsMessage {
   type: 'telemetry' | 'command_log' | 'sequence_progress';
   data: TelemetryData | CommandLogEntry | SequenceProgress;
-  timestamp: string;
+  timestamp?: string;
 }

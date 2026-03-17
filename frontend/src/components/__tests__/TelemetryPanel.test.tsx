@@ -10,7 +10,7 @@ describe('TelemetryPanel', () => {
 
   it('shows dashes when telemetry is null', () => {
     render(<TelemetryPanel />);
-    const dashes = screen.getAllByText('--');
+    const dashes = screen.getAllByText('---');
     expect(dashes.length).toBeGreaterThanOrEqual(5);
   });
 

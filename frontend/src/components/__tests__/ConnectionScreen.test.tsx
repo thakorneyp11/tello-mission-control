@@ -7,6 +7,7 @@ import { useDroneStore } from '@/stores/droneStore';
 vi.mock('@/lib/api', () => ({
   connectDrone: vi.fn().mockResolvedValue({ ok: true, status: 'connected', battery: 85 }),
   getSequences: vi.fn().mockResolvedValue([]),
+  startVideoStream: vi.fn().mockResolvedValue({ ok: true }),
 }));
 
 describe('ConnectionScreen', () => {
@@ -52,5 +53,24 @@ describe('ConnectionScreen', () => {
     await user.click(screen.getByText('CONNECT'));
     // Mock resolves immediately, so state transitions through connecting to connected
     expect(['connecting', 'connected']).toContain(useDroneStore.getState().connectionStatus);
+  });
+
+  it('renders preview HUD button', () => {
+    render(<ConnectionScreen />);
+    expect(screen.getByText('PREVIEW HUD')).toBeInTheDocument();
+  });
+
+  it('enters preview mode on preview button click', async () => {
+    const user = userEvent.setup();
+    render(<ConnectionScreen />);
+    await user.click(screen.getByText('PREVIEW HUD'));
+    expect(useDroneStore.getState().connectionStatus).toBe('connected');
+    expect(useDroneStore.getState().previewMode).toBe(true);
+  });
+
+  it('disables preview button when connecting', () => {
+    useDroneStore.setState({ connectionStatus: 'connecting' });
+    render(<ConnectionScreen />);
+    expect(screen.getByText('PREVIEW HUD')).toBeDisabled();
   });
 });

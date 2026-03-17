@@ -8,7 +8,7 @@ export default function EmergencyButton() {
   }, []);
 
   return (
-    <div className="fixed bottom-4 right-4 z-[3]">
+    <div className="fixed bottom-3 right-3 sm:bottom-6 sm:right-6 z-[3]">
       <button
         type="button"
         className="emergency-btn"

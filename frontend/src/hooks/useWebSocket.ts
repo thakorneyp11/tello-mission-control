@@ -6,6 +6,7 @@ const MAX_BACKOFF = 16000;
 
 export function useWebSocket() {
   const connectionStatus = useDroneStore((s) => s.connectionStatus);
+  const previewMode = useDroneStore((s) => s.previewMode);
   const setTelemetry = useDroneStore((s) => s.setTelemetry);
   const addCommandLog = useDroneStore((s) => s.addCommandLog);
   const setSequenceProgress = useDroneStore((s) => s.setSequenceProgress);
@@ -16,7 +17,8 @@ export function useWebSocket() {
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (connectionStatus !== 'connected') {
+    // Don't connect WebSocket in preview mode — no backend available
+    if (connectionStatus !== 'connected' || previewMode) {
       // Clean up on disconnect
       if (wsRef.current) {
         wsRef.current.close();
@@ -100,5 +102,5 @@ export function useWebSocket() {
         reconnectTimerRef.current = null;
       }
     };
-  }, [connectionStatus, setTelemetry, addCommandLog, setSequenceProgress, setIsFlying]);
+  }, [connectionStatus, previewMode, setTelemetry, addCommandLog, setSequenceProgress, setIsFlying]);
 }

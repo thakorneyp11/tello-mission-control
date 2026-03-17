@@ -3,6 +3,7 @@ import { useDroneStore } from '@/stores/droneStore';
 export default function ConnectionScreen() {
   const connectionStatus = useDroneStore((s) => s.connectionStatus);
   const connect = useDroneStore((s) => s.connect);
+  const enterPreview = useDroneStore((s) => s.enterPreview);
 
   const isConnecting = connectionStatus === 'connecting';
   const isError = connectionStatus === 'error';
@@ -38,6 +39,14 @@ export default function ConnectionScreen() {
         onClick={connect}
       >
         {isConnecting ? 'CONNECTING...' : 'CONNECT'}
+      </button>
+
+      <button
+        className="control-btn mt-3 px-6 py-2 text-hud-sm border-hud-secondary/30 text-hud-secondary hover:text-white"
+        disabled={isConnecting}
+        onClick={enterPreview}
+      >
+        PREVIEW HUD
       </button>
 
       {isError && (

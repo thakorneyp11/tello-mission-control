@@ -10,7 +10,15 @@ import {
 } from 'lucide-react';
 import { useDroneStore } from '@/stores/droneStore';
 import * as api from '@/lib/api';
+import { getBatteryLevel } from '@/lib/format';
 import type { FlipDirection } from '@/types/drone';
+
+const FLIP_LABELS: Record<FlipDirection, string> = {
+  forward: 'FWD',
+  back: 'BACK',
+  left: 'LEFT',
+  right: 'RIGHT',
+};
 
 export default function FlightControls() {
   const {
@@ -25,122 +33,133 @@ export default function FlightControls() {
   } = useDroneStore();
 
   const disabled = !isFlying || commandPending;
-  const lowBattery = (telemetry?.battery ?? 100) <= 50;
+  const lowBattery = getBatteryLevel(telemetry?.battery ?? 100) !== 'ok';
 
   return (
-    <div className="hud-panel animate-fade-in-up max-w-[320px] space-y-4">
-      <h3 className="hud-label">Flight Controls</h3>
+    <div className="hud-panel animate-fade-in-up max-w-[320px] !p-3">
+      <h3 className="hud-label mb-2">Flight Controls</h3>
 
       {/* D-Pad */}
-      <div className="grid grid-cols-3 gap-1.5">
+      <div className="grid grid-cols-3 gap-2 justify-items-center">
         <div />
         <button
-          className="control-btn w-11 h-11"
+          className="control-btn w-10 h-10 relative"
           disabled={disabled}
-          onClick={() => sendCommand(() => api.move('forward', moveDistance), 'MOVE FWD')}
+          onClick={() => sendCommand(() => api.move('forward', moveDistance))}
+          aria-label="Move forward"
         >
-          <ChevronUp size={18} />
+          <ChevronUp size={20} />
+          <span className="absolute bottom-0.5 right-1 text-[9px] text-white/30">W</span>
         </button>
         <div />
 
         <button
-          className="control-btn w-11 h-11"
+          className="control-btn w-10 h-10 relative"
           disabled={disabled}
-          onClick={() => sendCommand(() => api.move('left', moveDistance), 'MOVE LEFT')}
+          onClick={() => sendCommand(() => api.move('left', moveDistance))}
+          aria-label="Move left"
         >
-          <ChevronLeft size={18} />
+          <ChevronLeft size={20} />
+          <span className="absolute bottom-0.5 right-1 text-[9px] text-white/30">A</span>
         </button>
         <div className="flex items-center justify-center">
-          <span className="block w-1.5 h-1.5 rounded-full bg-white/20" />
+          <span className="block w-2 h-2 rounded-full bg-white/30" />
         </div>
         <button
-          className="control-btn w-11 h-11"
+          className="control-btn w-10 h-10 relative"
           disabled={disabled}
-          onClick={() => sendCommand(() => api.move('right', moveDistance), 'MOVE RIGHT')}
+          onClick={() => sendCommand(() => api.move('right', moveDistance))}
+          aria-label="Move right"
         >
-          <ChevronRight size={18} />
+          <ChevronRight size={20} />
+          <span className="absolute bottom-0.5 right-1 text-[9px] text-white/30">D</span>
         </button>
 
         <div />
         <button
-          className="control-btn w-11 h-11"
+          className="control-btn w-10 h-10 relative"
           disabled={disabled}
-          onClick={() => sendCommand(() => api.move('back', moveDistance), 'MOVE BACK')}
+          onClick={() => sendCommand(() => api.move('back', moveDistance))}
+          aria-label="Move back"
         >
-          <ChevronDown size={18} />
+          <ChevronDown size={20} />
+          <span className="absolute bottom-0.5 right-1 text-[9px] text-white/30">S</span>
         </button>
         <div />
       </div>
 
       {/* Vertical Controls */}
-      <div className="flex gap-1.5">
+      <div className="flex gap-2 mt-3">
         <button
-          className="control-btn flex-1 px-3 py-2"
+          className="control-btn flex-1 h-10 relative"
           disabled={disabled}
-          onClick={() => sendCommand(() => api.move('up', moveDistance), 'MOVE UP')}
+          onClick={() => sendCommand(() => api.move('up', moveDistance))}
+          aria-label="Move up"
         >
           <ArrowUp size={18} />
           UP
+          <span className="absolute bottom-0.5 right-1.5 text-[9px] text-white/30 normal-case">Space</span>
         </button>
         <button
-          className="control-btn flex-1 px-3 py-2"
+          className="control-btn flex-1 h-10 relative"
           disabled={disabled}
-          onClick={() => sendCommand(() => api.move('down', moveDistance), 'MOVE DOWN')}
+          onClick={() => sendCommand(() => api.move('down', moveDistance))}
+          aria-label="Move down"
         >
           <ArrowDown size={18} />
           DOWN
+          <span className="absolute bottom-0.5 right-1.5 text-[9px] text-white/30 normal-case">Shift</span>
         </button>
       </div>
 
       {/* Rotation Controls */}
-      <div className="space-y-1.5">
-        <span className="hud-label">Rotation</span>
-        <div className="flex gap-1.5">
+      <div className="mt-3">
+        <span className="hud-label block mb-1.5">Rotation</span>
+        <div className="flex gap-2">
           <button
-            className="control-btn flex-1 px-3 py-2"
+            className="control-btn flex-1 h-10 relative"
             disabled={disabled}
-            onClick={() => sendCommand(() => api.rotate('ccw', rotateAngle), 'ROTATE CCW')}
+            onClick={() => sendCommand(() => api.rotate('ccw', rotateAngle))}
+            aria-label="Rotate counter-clockwise"
           >
             <RotateCcw size={18} />
             CCW
+            <span className="absolute bottom-0.5 right-1.5 text-[9px] text-white/30">Q</span>
           </button>
           <button
-            className="control-btn flex-1 px-3 py-2"
+            className="control-btn flex-1 h-10 relative"
             disabled={disabled}
-            onClick={() => sendCommand(() => api.rotate('cw', rotateAngle), 'ROTATE CW')}
+            onClick={() => sendCommand(() => api.rotate('cw', rotateAngle))}
+            aria-label="Rotate clockwise"
           >
             <RotateCw size={18} />
             CW
+            <span className="absolute bottom-0.5 right-1.5 text-[9px] text-white/30">E</span>
           </button>
         </div>
       </div>
 
       {/* Flip Controls */}
-      <div className="space-y-1.5">
-        <span className="hud-label">Flips</span>
+      <div className="mt-3">
+        <span className="hud-label block mb-1.5">Flips</span>
         <div className="flex gap-1.5">
           {(['forward', 'back', 'left', 'right'] as FlipDirection[]).map((dir) => (
             <button
               key={dir}
-              className={`control-btn flex-1 text-hud-xs px-2.5 py-1.5 ${lowBattery ? 'opacity-50' : ''}`}
+              className={`control-btn flex-1 text-hud-xs px-1.5 py-2 ${lowBattery ? 'opacity-50' : ''}`}
               disabled={disabled}
-              title={lowBattery ? 'Low battery — flips may fail below 50%' : undefined}
-              onClick={() =>
-                sendCommand(
-                  () => api.flip(dir),
-                  `FLIP ${dir.toUpperCase()}`,
-                )
-              }
+              title={lowBattery ? 'Low battery — flips may fail below 50%' : `Flip ${dir}`}
+              onClick={() => sendCommand(() => api.flip(dir))}
             >
-              {dir[0].toUpperCase()}
+              {FLIP_LABELS[dir]}
             </button>
           ))}
         </div>
       </div>
 
       {/* Distance Slider */}
-      <div className="space-y-1">
-        <div className="flex items-center justify-between">
+      <div className="mt-3">
+        <div className="flex items-center justify-between mb-1">
           <span className="hud-label">Distance</span>
           <span className="font-mono text-hud-xs">{moveDistance} cm</span>
         </div>
@@ -156,8 +175,8 @@ export default function FlightControls() {
       </div>
 
       {/* Angle Slider */}
-      <div className="space-y-1">
-        <div className="flex items-center justify-between">
+      <div className="mt-2">
+        <div className="flex items-center justify-between mb-1">
           <span className="hud-label">Angle</span>
           <span className="font-mono text-hud-xs">{rotateAngle}&deg;</span>
         </div>

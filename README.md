@@ -15,8 +15,26 @@ Browser (React) ←HTTP/WS→ FastAPI + djitellopy ←UDP→ DJI Tello (192.168.
 
 ## Quick Start
 
-### 1. Backend
+### 1. Environment Setup
 
+```bash
+cp .env.template .env
+# Edit .env as needed (mock mode is enabled by default)
+```
+
+### 2. Docker (recommended)
+
+```bash
+docker compose up --build
+```
+
+This starts both services:
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+
+### 3. Native Development
+
+**Backend:**
 ```bash
 cd backend
 python -m venv .venv
@@ -30,21 +48,14 @@ TELLO_USE_MOCK_DRONE=true uvicorn app.main:app --host 0.0.0.0 --port 8000 --relo
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-### 2. Frontend
-
+**Frontend:**
 ```bash
 cd frontend
 npm ci
 npm run dev    # http://localhost:5173
 ```
 
-### 3. Docker (both services)
-
-```bash
-docker compose up --build
-```
-
-> **macOS note**: `network_mode: host` in `docker-compose.yml` won't give the container UDP access to the drone. Run the backend natively on macOS.
+> **Real drone on Linux**: If you need direct UDP access to the drone (192.168.10.1), add `network_mode: host` to the backend service in `docker-compose.yml`. Note that `network_mode: host` does not work on macOS/Windows — run the backend natively instead.
 
 ## Flying with the API
 
@@ -92,12 +103,45 @@ http://localhost:8000/api/video/stream
 wscat -c ws://localhost:8000/api/ws/telemetry
 ```
 
+Server pushes telemetry frames at ~4 Hz:
+
+```json
+{
+  "type": "telemetry",
+  "data": {
+    "battery": 85,
+    "height": 120,
+    "flight_time": 42,
+    "temperature": { "high": 65, "low": 60 },
+    "attitude": { "pitch": 2, "roll": -1, "yaw": 180 },
+    "speed": { "x": 0, "y": 10, "z": 0 },
+    "barometer": 150.5,
+    "tof_distance": 120
+  },
+  "timestamp": "2026-03-17T10:30:00.123Z"
+}
+```
+
+Command log events are also pushed over the same connection:
+
+```json
+{
+  "type": "command_log",
+  "data": {
+    "command": "move",
+    "params": { "direction": "forward", "distance_cm": 100 },
+    "result": "ok",
+    "timestamp": "2026-03-17T10:30:01.456Z"
+  }
+}
+```
+
 ## Running Tests
 
 ```bash
 cd backend
 source .venv/bin/activate
-python -m pytest -v    # 44 tests, all use MockTello (no drone needed)
+python -m pytest -v    # 54 tests, all use MockTello (no drone needed)
 ```
 
 ## API Reference
@@ -130,31 +174,43 @@ python -m pytest -v    # 44 tests, all use MockTello (no drone needed)
 
 ## Configuration
 
-All environment variables are prefixed with `TELLO_`:
+All environment variables are prefixed with `TELLO_`. See `.env.template` for the full list with defaults.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `TELLO_USE_MOCK_DRONE` | `false` | Use fake drone for development |
 | `TELLO_TELLO_HOST` | `192.168.10.1` | Drone IP address |
+| `TELLO_API_PORT` | `8000` | Backend server port |
+| `TELLO_FRONTEND_PORT` | `3000` | Frontend server port (Docker) |
 | `TELLO_TELEMETRY_POLL_HZ` | `4.0` | Telemetry polling frequency |
 | `TELLO_VIDEO_FPS` | `30` | Video stream frame rate |
 | `TELLO_VIDEO_JPEG_QUALITY` | `70` | JPEG compression quality |
+| `TELLO_CORS_ORIGINS` | `["http://localhost:3000","http://localhost:5173"]` | Allowed CORS origins |
 
 ## Project Structure
 
 ```
-├── backend/                 # FastAPI + djitellopy
+├── backend/                        # FastAPI + djitellopy
+│   ├── Dockerfile
 │   ├── app/
-│   │   ├── main.py          # App entry point, lifespan, CORS
-│   │   ├── config.py        # Settings via env vars
-│   │   ├── routers/         # API endpoints
-│   │   ├── services/        # DroneManager, TelemetryService
-│   │   └── models/          # Pydantic schemas
-│   └── tests/               # pytest (44 tests)
-├── frontend/                # React + Vite + TailwindCSS
+│   │   ├── main.py                 # App entry point, lifespan, CORS
+│   │   ├── config.py               # Settings via env vars
+│   │   ├── routers/                # API endpoints
+│   │   ├── services/               # DroneManager, TelemetryService
+│   │   └── models/                 # Pydantic schemas
+│   └── tests/                      # pytest (44 tests)
+├── frontend/                       # React + Vite + TailwindCSS
+│   ├── Dockerfile
+│   ├── nginx.conf                  # Nginx reverse proxy config
 │   └── src/
-├── docs/                    # PRD & Architecture docs
-└── docker-compose.yml
+├── sample_drone_integration/       # djitellopy reference scripts
+│   ├── droneeyes.py                # Video streaming example
+│   ├── drone_control_simple.py     # Basic flight control example
+│   └── drone_control_full.py       # Advanced flight choreography
+├── docs/                           # PRD & Architecture docs
+├── docker-compose.yml              # Both services orchestration
+├── .env.template                   # Environment variable template
+└── .env                            # Local environment config (gitignored)
 ```
 
 ## Safety

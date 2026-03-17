@@ -98,3 +98,11 @@ export function runSequence(id: string): Promise<ApiResponse> {
 export function cancelSequence(): Promise<ApiResponse> {
   return post<ApiResponse>('/api/sequences/cancel');
 }
+
+export function startVideoStream(): Promise<ApiResponse> {
+  return post<ApiResponse>('/api/video/stream/start');
+}
+
+export function stopVideoStream(): Promise<ApiResponse> {
+  return post<ApiResponse>('/api/video/stream/stop');
+}

@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
-import { Camera, Settings } from 'lucide-react';
+import { Camera, Settings, LogOut } from 'lucide-react';
 import { useDroneStore } from '@/stores/droneStore';
 import * as api from '@/lib/api';
+import { pad, batteryTextColor } from '@/lib/format';
 
 const STATUS_DOT_CLASS: Record<string, string> = {
   connected: 'bg-ok',
@@ -10,15 +11,15 @@ const STATUS_DOT_CLASS: Record<string, string> = {
   error: 'bg-danger',
 };
 
-function pad(n: number): string {
-  return String(n).padStart(2, '0');
-}
-
 export default function StatusBar() {
   const connectionStatus = useDroneStore((s) => s.connectionStatus);
   const isFlying = useDroneStore((s) => s.isFlying);
+  const previewMode = useDroneStore((s) => s.previewMode);
+  const telemetry = useDroneStore((s) => s.telemetry);
+  const disconnect = useDroneStore((s) => s.disconnect);
 
-  const canSnapshot = connectionStatus === 'connected' && isFlying;
+  const canSnapshot = connectionStatus === 'connected' && isFlying && !previewMode;
+  const battery = telemetry?.battery ?? null;
 
   const handleSnapshot = useCallback(async () => {
     try {
@@ -42,13 +43,23 @@ export default function StatusBar() {
     <div className="hud-panel animate-fade-in-up flex flex-row items-center gap-3">
       {/* Status dot */}
       <span
-        className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT_CLASS[connectionStatus] ?? 'bg-hud-dim'}`}
+        className={`w-2 h-2 rounded-full flex-shrink-0 ${previewMode ? 'bg-info' : (STATUS_DOT_CLASS[connectionStatus] ?? 'bg-hud-dim')}`}
       />
 
       {/* Status label */}
       <span className="font-mono uppercase text-hud-sm tracking-[0.08em]">
-        {connectionStatus}
+        {previewMode ? 'preview' : connectionStatus}
       </span>
+
+      {/* Battery inline (when available) */}
+      {battery !== null && !previewMode && (
+        <>
+          <span className="w-px h-4 bg-white/10" />
+          <span className={`font-mono text-hud-sm ${batteryTextColor(battery)}`}>
+            {battery}%
+          </span>
+        </>
+      )}
 
       {/* Separator */}
       <span className="w-px h-4 bg-white/10" />
@@ -75,6 +86,17 @@ export default function StatusBar() {
         aria-label="Settings"
       >
         <Settings size={18} strokeWidth={1.5} />
+      </button>
+
+      {/* Disconnect button */}
+      <button
+        type="button"
+        className="control-btn p-2 hover:text-danger hover:border-danger/30"
+        onClick={disconnect}
+        aria-label="Disconnect"
+        title="Disconnect and return to connection screen"
+      >
+        <LogOut size={18} strokeWidth={1.5} />
       </button>
     </div>
   );

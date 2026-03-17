@@ -135,4 +135,18 @@ describe('api client', () => {
   it('VIDEO_STREAM_URL is correct', () => {
     expect(api.VIDEO_STREAM_URL).toBe('/api/video/stream');
   });
+
+  it('startVideoStream sends POST to /api/video/stream/start', async () => {
+    const spy = mockFetch({ ok: true });
+    const res = await api.startVideoStream();
+    expect(spy).toHaveBeenCalledWith('/api/video/stream/start', expect.objectContaining({ method: 'POST' }));
+    expect(res.ok).toBe(true);
+  });
+
+  it('stopVideoStream sends POST to /api/video/stream/stop', async () => {
+    const spy = mockFetch({ ok: true });
+    const res = await api.stopVideoStream();
+    expect(spy).toHaveBeenCalledWith('/api/video/stream/stop', expect.objectContaining({ method: 'POST' }));
+    expect(res.ok).toBe(true);
+  });
 });

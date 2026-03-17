@@ -63,35 +63,39 @@ export default function ActionButtons({ onOpenSequences }: ActionButtonsProps) {
   }
 
   return (
-    <div className="flex items-end gap-3 animate-fade-in-up">
-      {/* Takeoff */}
+    <div className="hud-panel animate-fade-in-up flex items-center gap-3">
+      {/* Takeoff — primary action, slightly larger */}
       <button
-        className="control-btn border-ok text-ok hover:bg-ok/20 px-5 py-3"
+        className="control-btn border-ok text-ok hover:bg-ok/20 px-4 py-2.5 sm:px-6 sm:py-3.5 shadow-[0_0_12px_rgba(0,212,106,0.15)]"
         disabled={isFlying || commandPending || connectionStatus !== 'connected'}
         onClick={async () => {
-          const ok = await sendCommand(() => api.takeoff(), 'TAKEOFF');
+          const ok = await sendCommand(() => api.takeoff());
           if (ok) setIsFlying(true);
         }}
+        aria-label="Takeoff (T)"
       >
         <Plane size={18} />
         Takeoff
+        <span className="text-[9px] text-ok/40 ml-1 normal-case">T</span>
       </button>
 
       {/* Land */}
       <button
-        className="control-btn border-info text-info hover:bg-info/20 px-5 py-3"
+        className="control-btn border-info text-info hover:bg-info/20 px-3 py-2.5 sm:px-5 sm:py-3"
         disabled={!isFlying || commandPending}
         onClick={async () => {
-          const ok = await sendCommand(() => api.land(), 'LAND');
+          const ok = await sendCommand(() => api.land());
           if (ok) setIsFlying(false);
         }}
+        aria-label="Land (L)"
       >
         Land
+        <span className="text-[9px] text-info/40 ml-1 normal-case">L</span>
       </button>
 
       {/* Sequences */}
       <button
-        className="control-btn border-hud-secondary/30 text-hud-secondary px-4 py-3"
+        className="control-btn border-hud-secondary/30 text-hud-secondary px-3 py-2.5 sm:px-4 sm:py-3"
         disabled={!isFlying || isRunning}
         onClick={handleOpenSequences}
       >

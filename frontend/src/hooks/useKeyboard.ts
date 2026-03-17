@@ -36,40 +36,40 @@ export function useKeyboard() {
       switch (e.key.toLowerCase()) {
         case 'w':
           e.preventDefault();
-          sendCommand(() => api.move('forward', moveDistance), 'MOVE FWD');
+          sendCommand(() => api.move('forward', moveDistance));
           break;
         case 's':
           e.preventDefault();
-          sendCommand(() => api.move('back', moveDistance), 'MOVE BACK');
+          sendCommand(() => api.move('back', moveDistance));
           break;
         case 'a':
           e.preventDefault();
-          if (isFlying) sendCommand(() => api.move('left', moveDistance), 'MOVE LEFT');
+          if (isFlying) sendCommand(() => api.move('left', moveDistance));
           break;
         case 'd':
           e.preventDefault();
-          if (isFlying) sendCommand(() => api.move('right', moveDistance), 'MOVE RIGHT');
+          if (isFlying) sendCommand(() => api.move('right', moveDistance));
           break;
         case ' ':
           e.preventDefault();
-          if (isFlying) sendCommand(() => api.move('up', moveDistance), 'MOVE UP');
+          if (isFlying) sendCommand(() => api.move('up', moveDistance));
           break;
         case 'shift':
           e.preventDefault();
-          if (isFlying) sendCommand(() => api.move('down', moveDistance), 'MOVE DOWN');
+          if (isFlying) sendCommand(() => api.move('down', moveDistance));
           break;
         case 'q':
           e.preventDefault();
-          if (isFlying) sendCommand(() => api.rotate('ccw', rotateAngle), 'ROTATE CCW');
+          if (isFlying) sendCommand(() => api.rotate('ccw', rotateAngle));
           break;
         case 'e':
           e.preventDefault();
-          if (isFlying) sendCommand(() => api.rotate('cw', rotateAngle), 'ROTATE CW');
+          if (isFlying) sendCommand(() => api.rotate('cw', rotateAngle));
           break;
         case 't':
           e.preventDefault();
           if (!isFlying) {
-            sendCommand(() => api.takeoff(), 'TAKEOFF').then((ok) => {
+            sendCommand(() => api.takeoff()).then((ok) => {
               if (ok) setIsFlying(true);
             });
           }
@@ -77,7 +77,7 @@ export function useKeyboard() {
         case 'l':
           e.preventDefault();
           if (isFlying) {
-            sendCommand(() => api.land(), 'LAND').then((ok) => {
+            sendCommand(() => api.land()).then((ok) => {
               if (ok) setIsFlying(false);
             });
           }
