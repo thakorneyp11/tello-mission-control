@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    overflow: hidden;
+    font-family: 'Inter', 'SF Pro Display', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .hud-panel {
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    color: #ffffff;
+    padding: 16px;
+  }
+
+  .control-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+    transition: all 150ms ease;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .control-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .control-btn:active:not(:disabled) {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(0.97);
+  }
+
+  .control-btn:disabled {
+    opacity: 0.25;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  .emergency-btn {
+    background: rgba(255, 59, 48, 0.15);
+    border: 2px solid #ff3b30;
+    color: #ff3b30;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 12px;
+    padding: 16px 28px;
+    cursor: pointer;
+    transition: all 150ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    animation: pulse-border 2s ease-in-out infinite;
+  }
+
+  .emergency-btn:hover {
+    background: rgba(255, 59, 48, 0.3);
+    box-shadow: 0 0 20px rgba(255, 59, 48, 0.25);
+  }
+
+  .emergency-btn:active {
+    background: #ff3b30;
+    color: #ffffff;
+  }
+
+  .hud-label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #8b8f96;
+    font-weight: 600;
+  }
+
+  .hud-value {
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+    font-weight: 500;
+    transition: all 200ms ease;
+  }
+
+  /* Custom range slider */
+  .hud-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 1px;
+    outline: none;
+  }
+
+  .hud-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    border: none;
+  }
+
+  .hud-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    border: none;
+  }
+}
+
+@layer utilities {
+  .font-mono-value {
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

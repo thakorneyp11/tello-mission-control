@@ -1,0 +1,12 @@
+services:
+  backend:
+    build: ./backend
+    container_name: tello-backend
+    # Linux: network_mode: host gives direct UDP access to 192.168.10.1
+    # macOS/Windows: comment out network_mode and use ports instead
+    network_mode: host
+    environment:
+      - TELLO_TELLO_HOST=192.168.10.1
+      - TELLO_API_PORT=8000
+      - TELLO_USE_MOCK_DRONE=false
+    restart: unless-stopped
