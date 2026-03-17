@@ -6,9 +6,9 @@ t.connect()
 battery = t.get_battery()
 print(f'Battery: {battery}%')
 
-# if battery < 30:
-#     print('Battery too low for tricks! Charge the drone first.')
-#     exit()
+if battery < 30:
+    print('Battery too low for tricks! Charge the drone first.')
+    exit()
 
 try:
     t.takeoff()

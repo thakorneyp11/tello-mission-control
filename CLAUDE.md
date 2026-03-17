@@ -3,7 +3,6 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Implementation Guidelines
-
 Please review all relevant files with critical thinking, analyze with thinking process, plan todo with thinking process, implement with testing and verification. Create testcases to ensure requirements work as expected without interfering with other functionalities.
 
 If you found that the task is really huge and using agent teammates is more efficient, please create an agent team with multiple teammates to implement this requirements in parallel. from review codebase, technical design, UX/UI designing, reviewing/discussing codes/designs with each other, until the development/process ends and perform testing & verification together. If there's still room of improvements or any agent found any issue/bug, please handle it too.

@@ -48,10 +48,12 @@ interface DroneStore {
   // UI state
   commandLogCollapsed: boolean;
   toggleCommandLog: () => void;
+  previewMode: boolean;
 
   // Compound actions
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
+  enterPreview: () => void;
   sendCommand: (commandFn: () => Promise<ApiResponse>, label: string) => Promise<boolean>;
 }
 
@@ -95,6 +97,19 @@ export const useDroneStore = create<DroneStore>((set, get) => ({
   // UI state
   commandLogCollapsed: false,
   toggleCommandLog: () => set((s) => ({ commandLogCollapsed: !s.commandLogCollapsed })),
+  previewMode: false,
+
+  // Enter preview mode — shows HUD without drone connection
+  enterPreview: () => {
+    set({
+      connectionStatus: 'connected',
+      previewMode: true,
+      isFlying: false,
+      telemetry: null,
+      commandLog: [],
+      sequenceProgress: null,
+    });
+  },
 
   // Connect to drone
   connect: async () => {
@@ -108,6 +123,8 @@ export const useDroneStore = create<DroneStore>((set, get) => ({
             ? { ...get().telemetry!, battery: res.battery }
             : null,
         });
+        // Start video stream (fire-and-forget, non-blocking)
+        api.startVideoStream().catch(() => {});
         // Fetch available sequences
         try {
           const sequences = await api.getSequences();
@@ -125,10 +142,15 @@ export const useDroneStore = create<DroneStore>((set, get) => ({
 
   // Disconnect from drone
   disconnect: async () => {
-    try {
-      await api.disconnectDrone();
-    } catch {
-      // Best effort
+    const wasPreview = get().previewMode;
+    if (!wasPreview) {
+      // Stop video stream and disconnect (best effort)
+      api.stopVideoStream().catch(() => {});
+      try {
+        await api.disconnectDrone();
+      } catch {
+        // Best effort
+      }
     }
     set({
       connectionStatus: 'disconnected',
@@ -136,6 +158,7 @@ export const useDroneStore = create<DroneStore>((set, get) => ({
       telemetry: null,
       sequenceProgress: null,
       commandPending: false,
+      previewMode: false,
     });
   },
 

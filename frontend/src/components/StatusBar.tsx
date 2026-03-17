@@ -17,8 +17,9 @@ function pad(n: number): string {
 export default function StatusBar() {
   const connectionStatus = useDroneStore((s) => s.connectionStatus);
   const isFlying = useDroneStore((s) => s.isFlying);
+  const previewMode = useDroneStore((s) => s.previewMode);
 
-  const canSnapshot = connectionStatus === 'connected' && isFlying;
+  const canSnapshot = connectionStatus === 'connected' && isFlying && !previewMode;
 
   const handleSnapshot = useCallback(async () => {
     try {
@@ -42,12 +43,12 @@ export default function StatusBar() {
     <div className="hud-panel animate-fade-in-up flex flex-row items-center gap-3">
       {/* Status dot */}
       <span
-        className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT_CLASS[connectionStatus] ?? 'bg-hud-dim'}`}
+        className={`w-2 h-2 rounded-full flex-shrink-0 ${previewMode ? 'bg-info' : (STATUS_DOT_CLASS[connectionStatus] ?? 'bg-hud-dim')}`}
       />
 
       {/* Status label */}
       <span className="font-mono uppercase text-hud-sm tracking-[0.08em]">
-        {connectionStatus}
+        {previewMode ? 'preview' : connectionStatus}
       </span>
 
       {/* Separator */}

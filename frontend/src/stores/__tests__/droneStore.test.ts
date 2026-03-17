@@ -6,6 +6,8 @@ vi.mock('@/lib/api', () => ({
   connectDrone: vi.fn(),
   disconnectDrone: vi.fn(),
   getSequences: vi.fn(),
+  startVideoStream: vi.fn().mockResolvedValue({ ok: true }),
+  stopVideoStream: vi.fn().mockResolvedValue({ ok: true }),
 }));
 
 describe('droneStore', () => {
@@ -22,6 +24,7 @@ describe('droneStore', () => {
       moveDistance: 100,
       rotateAngle: 90,
       commandLogCollapsed: false,
+      previewMode: false,
     });
   });
 
@@ -131,6 +134,17 @@ describe('droneStore', () => {
     });
   });
 
+  describe('enterPreview', () => {
+    it('sets connected status and previewMode', () => {
+      useDroneStore.getState().enterPreview();
+      const state = useDroneStore.getState();
+      expect(state.connectionStatus).toBe('connected');
+      expect(state.previewMode).toBe(true);
+      expect(state.isFlying).toBe(false);
+      expect(state.telemetry).toBeNull();
+    });
+  });
+
   describe('disconnect', () => {
     it('resets all state', async () => {
       useDroneStore.setState({
@@ -154,6 +168,27 @@ describe('droneStore', () => {
       expect(state.commandPending).toBe(false);
       expect(state.telemetry).toBeNull();
       expect(state.sequenceProgress).toBeNull();
+    });
+
+    it('resets previewMode on disconnect', async () => {
+      useDroneStore.getState().enterPreview();
+      expect(useDroneStore.getState().previewMode).toBe(true);
+
+      await useDroneStore.getState().disconnect();
+      expect(useDroneStore.getState().previewMode).toBe(false);
+      expect(useDroneStore.getState().connectionStatus).toBe('disconnected');
+    });
+
+    it('does not call backend API when disconnecting from preview mode', async () => {
+      const { disconnectDrone, stopVideoStream } = await import('@/lib/api');
+      vi.mocked(disconnectDrone).mockClear();
+      vi.mocked(stopVideoStream).mockClear();
+
+      useDroneStore.getState().enterPreview();
+      await useDroneStore.getState().disconnect();
+
+      expect(disconnectDrone).not.toHaveBeenCalled();
+      expect(stopVideoStream).not.toHaveBeenCalled();
     });
   });
 
