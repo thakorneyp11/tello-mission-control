@@ -51,19 +51,30 @@ export default function CommandLog() {
 
   const visibleEntries = collapsed ? commandLog.slice(-1) : commandLog;
 
+  const isEmpty = commandLog.length === 0;
+
   return (
-    <div className="hud-panel animate-fade-in-up w-[260px]">
+    <div className={`hud-panel animate-fade-in-up w-[260px] ${isEmpty ? 'pb-3' : ''}`}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-2">
-        <span className="hud-label">COMMAND LOG</span>
-        <button className="control-btn p-1" onClick={toggleCommandLog}>
-          {collapsed ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
-        </button>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="hud-label">Command Log</span>
+          {!isEmpty && (
+            <span className="text-[10px] font-mono text-hud-dim bg-white/[0.06] px-1.5 py-0.5 rounded">
+              {commandLog.length}
+            </span>
+          )}
+        </div>
+        {!isEmpty && (
+          <button className="control-btn p-1" onClick={toggleCommandLog} aria-label="Toggle command log">
+            {collapsed ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+          </button>
+        )}
       </div>
 
       {/* Entries */}
-      {commandLog.length === 0 ? (
-        <p className="text-hud-xs text-hud-dim italic text-center py-2">
+      {isEmpty ? (
+        <p className="text-hud-xs text-hud-dim text-center mt-2">
           No commands yet
         </p>
       ) : (
@@ -72,8 +83,8 @@ export default function CommandLog() {
           onScroll={handleScroll}
           className={
             collapsed
-              ? ''
-              : 'max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10'
+              ? 'mt-2'
+              : 'mt-2 max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10'
           }
         >
           {visibleEntries.map((entry, i) => (

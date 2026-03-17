@@ -21,7 +21,7 @@ export default function HudLayout() {
           gridTemplateRows: 'auto 1fr auto',
           gridTemplateAreas: `
             "telemetry  .        status"
-            "telemetry  .        cmdlog"
+            ".          .        cmdlog"
             "controls   actions  ."
           `,
         }}

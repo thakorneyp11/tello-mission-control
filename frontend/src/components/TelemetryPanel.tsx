@@ -30,7 +30,7 @@ export default function TelemetryPanel() {
   const attitude = telemetry?.attitude ?? null;
   const tempHigh = telemetry?.temperature.high ?? null;
 
-  const nullValue = <span className="text-hud-dim">--</span>;
+  const nullValue = <span className="text-hud-secondary">---</span>;
 
   return (
     <div className="hud-panel animate-fade-in-up w-[200px]">

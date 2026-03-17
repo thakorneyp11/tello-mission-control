@@ -63,18 +63,20 @@ export default function ActionButtons({ onOpenSequences }: ActionButtonsProps) {
   }
 
   return (
-    <div className="flex items-end gap-3 animate-fade-in-up">
-      {/* Takeoff */}
+    <div className="hud-panel animate-fade-in-up flex items-center gap-3">
+      {/* Takeoff — primary action, slightly larger */}
       <button
-        className="control-btn border-ok text-ok hover:bg-ok/20 px-5 py-3"
+        className="control-btn border-ok text-ok hover:bg-ok/20 px-6 py-3.5 shadow-[0_0_12px_rgba(0,212,106,0.15)]"
         disabled={isFlying || commandPending || connectionStatus !== 'connected'}
         onClick={async () => {
           const ok = await sendCommand(() => api.takeoff(), 'TAKEOFF');
           if (ok) setIsFlying(true);
         }}
+        aria-label="Takeoff (T)"
       >
         <Plane size={18} />
         Takeoff
+        <span className="text-[9px] text-ok/40 ml-1 normal-case">T</span>
       </button>
 
       {/* Land */}
@@ -85,8 +87,10 @@ export default function ActionButtons({ onOpenSequences }: ActionButtonsProps) {
           const ok = await sendCommand(() => api.land(), 'LAND');
           if (ok) setIsFlying(false);
         }}
+        aria-label="Land (L)"
       >
         Land
+        <span className="text-[9px] text-info/40 ml-1 normal-case">L</span>
       </button>
 
       {/* Sequences */}

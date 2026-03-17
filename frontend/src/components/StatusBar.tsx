@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Camera, Settings } from 'lucide-react';
+import { Camera, Settings, LogOut } from 'lucide-react';
 import { useDroneStore } from '@/stores/droneStore';
 import * as api from '@/lib/api';
 
@@ -18,8 +18,11 @@ export default function StatusBar() {
   const connectionStatus = useDroneStore((s) => s.connectionStatus);
   const isFlying = useDroneStore((s) => s.isFlying);
   const previewMode = useDroneStore((s) => s.previewMode);
+  const telemetry = useDroneStore((s) => s.telemetry);
+  const disconnect = useDroneStore((s) => s.disconnect);
 
   const canSnapshot = connectionStatus === 'connected' && isFlying && !previewMode;
+  const battery = telemetry?.battery ?? null;
 
   const handleSnapshot = useCallback(async () => {
     try {
@@ -51,6 +54,16 @@ export default function StatusBar() {
         {previewMode ? 'preview' : connectionStatus}
       </span>
 
+      {/* Battery inline (when available) */}
+      {battery !== null && !previewMode && (
+        <>
+          <span className="w-px h-4 bg-white/10" />
+          <span className={`font-mono text-hud-sm ${battery <= 20 ? 'text-danger' : battery <= 50 ? 'text-caution' : 'text-ok'}`}>
+            {battery}%
+          </span>
+        </>
+      )}
+
       {/* Separator */}
       <span className="w-px h-4 bg-white/10" />
 
@@ -76,6 +89,17 @@ export default function StatusBar() {
         aria-label="Settings"
       >
         <Settings size={18} strokeWidth={1.5} />
+      </button>
+
+      {/* Disconnect button */}
+      <button
+        type="button"
+        className="control-btn p-2 hover:text-danger hover:border-danger/30"
+        onClick={disconnect}
+        aria-label="Disconnect"
+        title="Disconnect and return to connection screen"
+      >
+        <LogOut size={18} strokeWidth={1.5} />
       </button>
     </div>
   );
