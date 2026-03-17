@@ -84,7 +84,7 @@ export default function CommandLog() {
           className={
             collapsed
               ? 'mt-2'
-              : 'mt-2 max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10'
+              : 'mt-2 max-h-[150px] overflow-y-auto'
           }
         >
           {visibleEntries.map((entry, i) => (

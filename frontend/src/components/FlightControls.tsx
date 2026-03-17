@@ -35,14 +35,14 @@ export default function FlightControls() {
   const lowBattery = (telemetry?.battery ?? 100) <= 50;
 
   return (
-    <div className="hud-panel animate-fade-in-up max-w-[320px]">
-      <h3 className="hud-label mb-3">Flight Controls</h3>
+    <div className="hud-panel animate-fade-in-up max-w-[320px] !p-3">
+      <h3 className="hud-label mb-2">Flight Controls</h3>
 
       {/* D-Pad */}
       <div className="grid grid-cols-3 gap-2 justify-items-center">
         <div />
         <button
-          className="control-btn w-12 h-12 relative"
+          className="control-btn w-10 h-10 relative"
           disabled={disabled}
           onClick={() => sendCommand(() => api.move('forward', moveDistance), 'MOVE FWD')}
           aria-label="Move forward"
@@ -53,7 +53,7 @@ export default function FlightControls() {
         <div />
 
         <button
-          className="control-btn w-12 h-12 relative"
+          className="control-btn w-10 h-10 relative"
           disabled={disabled}
           onClick={() => sendCommand(() => api.move('left', moveDistance), 'MOVE LEFT')}
           aria-label="Move left"
@@ -65,7 +65,7 @@ export default function FlightControls() {
           <span className="block w-2 h-2 rounded-full bg-white/30" />
         </div>
         <button
-          className="control-btn w-12 h-12 relative"
+          className="control-btn w-10 h-10 relative"
           disabled={disabled}
           onClick={() => sendCommand(() => api.move('right', moveDistance), 'MOVE RIGHT')}
           aria-label="Move right"
@@ -76,7 +76,7 @@ export default function FlightControls() {
 
         <div />
         <button
-          className="control-btn w-12 h-12 relative"
+          className="control-btn w-10 h-10 relative"
           disabled={disabled}
           onClick={() => sendCommand(() => api.move('back', moveDistance), 'MOVE BACK')}
           aria-label="Move back"
@@ -88,9 +88,9 @@ export default function FlightControls() {
       </div>
 
       {/* Vertical Controls */}
-      <div className="flex gap-2 mt-4">
+      <div className="flex gap-2 mt-3">
         <button
-          className="control-btn flex-1 h-12 relative"
+          className="control-btn flex-1 h-10 relative"
           disabled={disabled}
           onClick={() => sendCommand(() => api.move('up', moveDistance), 'MOVE UP')}
           aria-label="Move up"
@@ -100,7 +100,7 @@ export default function FlightControls() {
           <span className="absolute bottom-0.5 right-1.5 text-[9px] text-white/30 normal-case">Space</span>
         </button>
         <button
-          className="control-btn flex-1 h-12 relative"
+          className="control-btn flex-1 h-10 relative"
           disabled={disabled}
           onClick={() => sendCommand(() => api.move('down', moveDistance), 'MOVE DOWN')}
           aria-label="Move down"
@@ -112,11 +112,11 @@ export default function FlightControls() {
       </div>
 
       {/* Rotation Controls */}
-      <div className="mt-4">
+      <div className="mt-3">
         <span className="hud-label block mb-1.5">Rotation</span>
         <div className="flex gap-2">
           <button
-            className="control-btn flex-1 h-12 relative"
+            className="control-btn flex-1 h-10 relative"
             disabled={disabled}
             onClick={() => sendCommand(() => api.rotate('ccw', rotateAngle), 'ROTATE CCW')}
             aria-label="Rotate counter-clockwise"
@@ -126,7 +126,7 @@ export default function FlightControls() {
             <span className="absolute bottom-0.5 right-1.5 text-[9px] text-white/30">Q</span>
           </button>
           <button
-            className="control-btn flex-1 h-12 relative"
+            className="control-btn flex-1 h-10 relative"
             disabled={disabled}
             onClick={() => sendCommand(() => api.rotate('cw', rotateAngle), 'ROTATE CW')}
             aria-label="Rotate clockwise"
@@ -139,7 +139,7 @@ export default function FlightControls() {
       </div>
 
       {/* Flip Controls */}
-      <div className="mt-4">
+      <div className="mt-3">
         <span className="hud-label block mb-1.5">Flips</span>
         <div className="flex gap-1.5">
           {(['forward', 'back', 'left', 'right'] as FlipDirection[]).map((dir) => (
@@ -162,7 +162,7 @@ export default function FlightControls() {
       </div>
 
       {/* Distance Slider */}
-      <div className="mt-4">
+      <div className="mt-3">
         <div className="flex items-center justify-between mb-1">
           <span className="hud-label">Distance</span>
           <span className="font-mono text-hud-xs">{moveDistance} cm</span>
@@ -179,7 +179,7 @@ export default function FlightControls() {
       </div>
 
       {/* Angle Slider */}
-      <div className="mt-3">
+      <div className="mt-2">
         <div className="flex items-center justify-between mb-1">
           <span className="hud-label">Angle</span>
           <span className="font-mono text-hud-xs">{rotateAngle}&deg;</span>

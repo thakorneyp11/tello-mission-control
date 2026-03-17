@@ -66,7 +66,7 @@ export default function ActionButtons({ onOpenSequences }: ActionButtonsProps) {
     <div className="hud-panel animate-fade-in-up flex items-center gap-3">
       {/* Takeoff — primary action, slightly larger */}
       <button
-        className="control-btn border-ok text-ok hover:bg-ok/20 px-6 py-3.5 shadow-[0_0_12px_rgba(0,212,106,0.15)]"
+        className="control-btn border-ok text-ok hover:bg-ok/20 px-4 py-2.5 sm:px-6 sm:py-3.5 shadow-[0_0_12px_rgba(0,212,106,0.15)]"
         disabled={isFlying || commandPending || connectionStatus !== 'connected'}
         onClick={async () => {
           const ok = await sendCommand(() => api.takeoff(), 'TAKEOFF');
@@ -81,7 +81,7 @@ export default function ActionButtons({ onOpenSequences }: ActionButtonsProps) {
 
       {/* Land */}
       <button
-        className="control-btn border-info text-info hover:bg-info/20 px-5 py-3"
+        className="control-btn border-info text-info hover:bg-info/20 px-3 py-2.5 sm:px-5 sm:py-3"
         disabled={!isFlying || commandPending}
         onClick={async () => {
           const ok = await sendCommand(() => api.land(), 'LAND');
@@ -95,7 +95,7 @@ export default function ActionButtons({ onOpenSequences }: ActionButtonsProps) {
 
       {/* Sequences */}
       <button
-        className="control-btn border-hud-secondary/30 text-hud-secondary px-4 py-3"
+        className="control-btn border-hud-secondary/30 text-hud-secondary px-3 py-2.5 sm:px-4 sm:py-3"
         disabled={!isFlying || isRunning}
         onClick={handleOpenSequences}
       >
