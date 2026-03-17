@@ -27,6 +27,15 @@ class MockTello:
         self._battery = 85
         self._height = 0
         self._flight_time = 0
+        self._yaw = 0
+        self._pitch = 0
+        self._roll = 0
+        self._speed_x = 0
+        self._speed_y = 0
+        self._speed_z = 0
+        self._barometer = 0.0
+        self._temp_high = 65.0
+        self._temp_low = 60.0
 
     def connect(self) -> None:
         self._connected = True
@@ -36,48 +45,70 @@ class MockTello:
         self._connected = False
         self._flying = False
         self._height = 0
+        self._barometer = 0.0
         logger.info("MockTello: disconnected")
 
     def takeoff(self) -> None:
         self._flying = True
         self._height = 50
+        self._barometer = 50.0
         logger.info("MockTello: takeoff")
 
     def land(self) -> None:
         self._flying = False
         self._height = 0
+        self._barometer = 0.0
+        self._speed_x = 0
+        self._speed_y = 0
+        self._speed_z = 0
         logger.info("MockTello: land")
 
     def emergency(self) -> None:
         self._flying = False
         self._height = 0
+        self._barometer = 0.0
+        self._speed_x = 0
+        self._speed_y = 0
+        self._speed_z = 0
         logger.info("MockTello: emergency stop")
 
     def move_forward(self, x: int) -> None:
+        self._speed_y = x
         logger.info("MockTello: move_forward %dcm", x)
 
     def move_back(self, x: int) -> None:
+        self._speed_y = -x
         logger.info("MockTello: move_back %dcm", x)
 
     def move_left(self, x: int) -> None:
+        self._speed_x = -x
         logger.info("MockTello: move_left %dcm", x)
 
     def move_right(self, x: int) -> None:
+        self._speed_x = x
         logger.info("MockTello: move_right %dcm", x)
 
     def move_up(self, x: int) -> None:
         self._height += x
+        self._barometer = float(self._height)
+        self._speed_z = x
         logger.info("MockTello: move_up %dcm", x)
 
     def move_down(self, x: int) -> None:
         self._height = max(0, self._height - x)
+        self._barometer = float(self._height)
+        self._speed_z = -x
         logger.info("MockTello: move_down %dcm", x)
 
     def rotate_clockwise(self, x: int) -> None:
+        self._yaw = (self._yaw + x) % 360
         logger.info("MockTello: rotate_cw %ddeg", x)
 
     def rotate_counter_clockwise(self, x: int) -> None:
+        self._yaw = (self._yaw - x) % 360
         logger.info("MockTello: rotate_ccw %ddeg", x)
+
+    # -- Telemetry getters (matching djitellopy.Tello API) --
 
     def get_battery(self) -> int:
         return self._battery
@@ -88,8 +119,37 @@ class MockTello:
     def get_flight_time(self) -> int:
         return self._flight_time
 
-    def get_temperature(self) -> float:
-        return 62.0
+    def get_highest_temperature(self) -> float:
+        return self._temp_high
+
+    def get_lowest_temperature(self) -> float:
+        return self._temp_low
+
+    def get_pitch(self) -> int:
+        return self._pitch
+
+    def get_roll(self) -> int:
+        return self._roll
+
+    def get_yaw(self) -> int:
+        return self._yaw
+
+    def get_speed_x(self) -> int:
+        return self._speed_x
+
+    def get_speed_y(self) -> int:
+        return self._speed_y
+
+    def get_speed_z(self) -> int:
+        return self._speed_z
+
+    def get_barometer(self) -> float:
+        return self._barometer
+
+    def get_distance_tof(self) -> int:
+        return self._height
+
+    # -- Video --
 
     def streamon(self) -> None:
         logger.info("MockTello: stream on")
@@ -351,12 +411,39 @@ class DroneManager:
 
     async def get_telemetry(self) -> dict:
         if not self._tello:
-            return {"battery": 0, "height": 0, "flight_time": 0, "temperature": 0.0}
+            return {
+                "battery": 0, "height": 0, "flight_time": 0,
+                "temperature": {"high": 0.0, "low": 0.0},
+                "attitude": {"pitch": 0, "roll": 0, "yaw": 0},
+                "speed": {"x": 0, "y": 0, "z": 0},
+                "barometer": 0.0, "tof_distance": 0,
+            }
+        t = self._tello
+        (
+            battery, height, flight_time, temp_high, temp_low,
+            pitch, roll, yaw, speed_x, speed_y, speed_z,
+            barometer, tof,
+        ) = await asyncio.gather(
+            asyncio.to_thread(t.get_battery),
+            asyncio.to_thread(t.get_height),
+            asyncio.to_thread(t.get_flight_time),
+            asyncio.to_thread(t.get_highest_temperature),
+            asyncio.to_thread(t.get_lowest_temperature),
+            asyncio.to_thread(t.get_pitch),
+            asyncio.to_thread(t.get_roll),
+            asyncio.to_thread(t.get_yaw),
+            asyncio.to_thread(t.get_speed_x),
+            asyncio.to_thread(t.get_speed_y),
+            asyncio.to_thread(t.get_speed_z),
+            asyncio.to_thread(t.get_barometer),
+            asyncio.to_thread(t.get_distance_tof),
+        )
         return {
-            "battery": await asyncio.to_thread(self._tello.get_battery),
-            "height": await asyncio.to_thread(self._tello.get_height),
-            "flight_time": await asyncio.to_thread(self._tello.get_flight_time),
-            "temperature": await asyncio.to_thread(self._tello.get_temperature),
+            "battery": battery, "height": height, "flight_time": flight_time,
+            "temperature": {"high": temp_high, "low": temp_low},
+            "attitude": {"pitch": pitch, "roll": roll, "yaw": yaw},
+            "speed": {"x": speed_x, "y": speed_y, "z": speed_z},
+            "barometer": barometer, "tof_distance": tof,
         }
 
     # -- Guards --

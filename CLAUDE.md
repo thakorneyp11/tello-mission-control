@@ -87,7 +87,7 @@ cd frontend && npx vitest run                   # Frontend tests (CI mode)
 │   │   └── models/
 │   │       ├── commands.py         # Pydantic request/response schemas with validation
 │   │       └── telemetry.py        # Telemetry data models
-│   └── tests/                      # pytest (44 tests)
+│   └── tests/                      # pytest (54 tests)
 ├── frontend/                       # React + Vite + TailwindCSS
 │   ├── Dockerfile                  # Multi-stage: Node build → Nginx runtime
 │   ├── nginx.conf                  # SPA fallback + API/WS/MJPEG reverse proxy
@@ -116,7 +116,7 @@ cd frontend && npx vitest run                   # Frontend tests (CI mode)
 - REST: `GET /api/video/stream` (MJPEG), `POST /api/video/stream/start`, `POST /api/video/stream/stop`, `POST /api/video/snapshot`
 - REST: `GET /api/status` — `{ connected, flying, streaming, battery }`
 - REST: `GET /api/sequences` — stub, returns `[]`
-- WebSocket: `WS /api/ws/telemetry` — pushes telemetry frames and command log events
+- WebSocket: `WS /api/ws/telemetry` — pushes telemetry frames (~4Hz) with `{battery, height, flight_time, temperature{high,low}, attitude{pitch,roll,yaw}, speed{x,y,z}, barometer, tof_distance}` and command log events
 
 ### Not yet implemented
 - `POST /api/control/{flip,rc}` (P1)
