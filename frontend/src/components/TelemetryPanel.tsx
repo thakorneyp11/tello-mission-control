@@ -1,16 +1,5 @@
 import { useDroneStore } from '@/stores/droneStore';
-
-function formatFlightTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${String(s).padStart(2, '0')}`;
-}
-
-function batteryBarColor(level: number): string {
-  if (level > 50) return 'bg-ok';
-  if (level >= 20) return 'bg-caution';
-  return 'bg-danger animate-pulse-glow';
-}
+import { formatFlightTime, batteryBarColor } from '@/lib/format';
 
 export default function TelemetryPanel() {
   const telemetry = useDroneStore((s) => s.telemetry);

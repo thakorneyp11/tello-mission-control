@@ -86,7 +86,7 @@ describe('droneStore', () => {
           resolveCommand = res;
         });
 
-      const promise = useDroneStore.getState().sendCommand(commandFn, 'TEST');
+      const promise = useDroneStore.getState().sendCommand(commandFn);
       expect(useDroneStore.getState().commandPending).toBe(true);
 
       resolveCommand!({ ok: true });
@@ -100,14 +100,14 @@ describe('droneStore', () => {
       useDroneStore.setState({ commandPending: true });
       const commandFn = vi.fn().mockResolvedValue({ ok: true });
 
-      const result = await useDroneStore.getState().sendCommand(commandFn, 'TEST');
+      const result = await useDroneStore.getState().sendCommand(commandFn);
       expect(commandFn).not.toHaveBeenCalled();
       expect(result).toBe(false);
     });
 
     it('returns false on error', async () => {
       const commandFn = vi.fn().mockRejectedValue(new Error('fail'));
-      const result = await useDroneStore.getState().sendCommand(commandFn, 'TEST');
+      const result = await useDroneStore.getState().sendCommand(commandFn);
       expect(result).toBe(false);
       expect(useDroneStore.getState().commandPending).toBe(false);
     });

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useDroneStore } from '@/stores/droneStore';
 import * as api from '@/lib/api';
+import { getBatteryLevel } from '@/lib/format';
 import type { FlipDirection } from '@/types/drone';
 
 const FLIP_LABELS: Record<FlipDirection, string> = {
@@ -32,7 +33,7 @@ export default function FlightControls() {
   } = useDroneStore();
 
   const disabled = !isFlying || commandPending;
-  const lowBattery = (telemetry?.battery ?? 100) <= 50;
+  const lowBattery = getBatteryLevel(telemetry?.battery ?? 100) !== 'ok';
 
   return (
     <div className="hud-panel animate-fade-in-up max-w-[320px] !p-3">
@@ -44,7 +45,7 @@ export default function FlightControls() {
         <button
           className="control-btn w-10 h-10 relative"
           disabled={disabled}
-          onClick={() => sendCommand(() => api.move('forward', moveDistance), 'MOVE FWD')}
+          onClick={() => sendCommand(() => api.move('forward', moveDistance))}
           aria-label="Move forward"
         >
           <ChevronUp size={20} />
@@ -55,7 +56,7 @@ export default function FlightControls() {
         <button
           className="control-btn w-10 h-10 relative"
           disabled={disabled}
-          onClick={() => sendCommand(() => api.move('left', moveDistance), 'MOVE LEFT')}
+          onClick={() => sendCommand(() => api.move('left', moveDistance))}
           aria-label="Move left"
         >
           <ChevronLeft size={20} />
@@ -67,7 +68,7 @@ export default function FlightControls() {
         <button
           className="control-btn w-10 h-10 relative"
           disabled={disabled}
-          onClick={() => sendCommand(() => api.move('right', moveDistance), 'MOVE RIGHT')}
+          onClick={() => sendCommand(() => api.move('right', moveDistance))}
           aria-label="Move right"
         >
           <ChevronRight size={20} />
@@ -78,7 +79,7 @@ export default function FlightControls() {
         <button
           className="control-btn w-10 h-10 relative"
           disabled={disabled}
-          onClick={() => sendCommand(() => api.move('back', moveDistance), 'MOVE BACK')}
+          onClick={() => sendCommand(() => api.move('back', moveDistance))}
           aria-label="Move back"
         >
           <ChevronDown size={20} />
@@ -92,7 +93,7 @@ export default function FlightControls() {
         <button
           className="control-btn flex-1 h-10 relative"
           disabled={disabled}
-          onClick={() => sendCommand(() => api.move('up', moveDistance), 'MOVE UP')}
+          onClick={() => sendCommand(() => api.move('up', moveDistance))}
           aria-label="Move up"
         >
           <ArrowUp size={18} />
@@ -102,7 +103,7 @@ export default function FlightControls() {
         <button
           className="control-btn flex-1 h-10 relative"
           disabled={disabled}
-          onClick={() => sendCommand(() => api.move('down', moveDistance), 'MOVE DOWN')}
+          onClick={() => sendCommand(() => api.move('down', moveDistance))}
           aria-label="Move down"
         >
           <ArrowDown size={18} />
@@ -118,7 +119,7 @@ export default function FlightControls() {
           <button
             className="control-btn flex-1 h-10 relative"
             disabled={disabled}
-            onClick={() => sendCommand(() => api.rotate('ccw', rotateAngle), 'ROTATE CCW')}
+            onClick={() => sendCommand(() => api.rotate('ccw', rotateAngle))}
             aria-label="Rotate counter-clockwise"
           >
             <RotateCcw size={18} />
@@ -128,7 +129,7 @@ export default function FlightControls() {
           <button
             className="control-btn flex-1 h-10 relative"
             disabled={disabled}
-            onClick={() => sendCommand(() => api.rotate('cw', rotateAngle), 'ROTATE CW')}
+            onClick={() => sendCommand(() => api.rotate('cw', rotateAngle))}
             aria-label="Rotate clockwise"
           >
             <RotateCw size={18} />
@@ -148,12 +149,7 @@ export default function FlightControls() {
               className={`control-btn flex-1 text-hud-xs px-1.5 py-2 ${lowBattery ? 'opacity-50' : ''}`}
               disabled={disabled}
               title={lowBattery ? 'Low battery — flips may fail below 50%' : `Flip ${dir}`}
-              onClick={() =>
-                sendCommand(
-                  () => api.flip(dir),
-                  `FLIP ${dir.toUpperCase()}`,
-                )
-              }
+              onClick={() => sendCommand(() => api.flip(dir))}
             >
               {FLIP_LABELS[dir]}
             </button>

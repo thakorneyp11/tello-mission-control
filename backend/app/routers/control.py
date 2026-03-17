@@ -70,7 +70,7 @@ async def emergency(request: Request):
 async def move(request: Request, body: MoveRequest):
     dm = _get_dm(request)
     try:
-        result = await dm.move(body.direction.value, body.distance_cm)
+        result = await dm.move(body.direction, body.distance_cm)
         return CommandResponse(**result)
     except DroneNotConnectedError:
         raise HTTPException(status_code=409, detail="Drone is not connected")
@@ -84,7 +84,7 @@ async def move(request: Request, body: MoveRequest):
 async def rotate(request: Request, body: RotateRequest):
     dm = _get_dm(request)
     try:
-        result = await dm.rotate(body.direction.value, body.angle_deg)
+        result = await dm.rotate(body.direction, body.angle_deg)
         return CommandResponse(**result)
     except DroneNotConnectedError:
         raise HTTPException(status_code=409, detail="Drone is not connected")

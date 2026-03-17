@@ -69,7 +69,7 @@ export default function ActionButtons({ onOpenSequences }: ActionButtonsProps) {
         className="control-btn border-ok text-ok hover:bg-ok/20 px-4 py-2.5 sm:px-6 sm:py-3.5 shadow-[0_0_12px_rgba(0,212,106,0.15)]"
         disabled={isFlying || commandPending || connectionStatus !== 'connected'}
         onClick={async () => {
-          const ok = await sendCommand(() => api.takeoff(), 'TAKEOFF');
+          const ok = await sendCommand(() => api.takeoff());
           if (ok) setIsFlying(true);
         }}
         aria-label="Takeoff (T)"
@@ -84,7 +84,7 @@ export default function ActionButtons({ onOpenSequences }: ActionButtonsProps) {
         className="control-btn border-info text-info hover:bg-info/20 px-3 py-2.5 sm:px-5 sm:py-3"
         disabled={!isFlying || commandPending}
         onClick={async () => {
-          const ok = await sendCommand(() => api.land(), 'LAND');
+          const ok = await sendCommand(() => api.land());
           if (ok) setIsFlying(false);
         }}
         aria-label="Land (L)"

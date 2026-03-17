@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from typing import Any, Callable
 
 from app.config import settings
+from app.models.commands import MoveDirection, RotateDirection
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,14 @@ class MockTello:
         self._temp_high = 65.0
         self._temp_low = 60.0
 
+    def _reset_flight_state(self) -> None:
+        self._flying = False
+        self._height = 0
+        self._barometer = 0.0
+        self._speed_x = 0
+        self._speed_y = 0
+        self._speed_z = 0
+
     def connect(self) -> None:
         self._connected = True
         logger.info("MockTello: connected")
@@ -55,21 +64,11 @@ class MockTello:
         logger.info("MockTello: takeoff")
 
     def land(self) -> None:
-        self._flying = False
-        self._height = 0
-        self._barometer = 0.0
-        self._speed_x = 0
-        self._speed_y = 0
-        self._speed_z = 0
+        self._reset_flight_state()
         logger.info("MockTello: land")
 
     def emergency(self) -> None:
-        self._flying = False
-        self._height = 0
-        self._barometer = 0.0
-        self._speed_x = 0
-        self._speed_y = 0
-        self._speed_z = 0
+        self._reset_flight_state()
         logger.info("MockTello: emergency stop")
 
     def move_forward(self, x: int) -> None:
@@ -342,37 +341,37 @@ class DroneManager:
 
     # -- Movement --
 
-    async def move(self, direction: str, distance_cm: int) -> dict:
+    async def move(self, direction: MoveDirection, distance_cm: int) -> dict:
         self._require_connected()
         self._require_flying()
         method_map = {
-            "forward": self._tello.move_forward,
-            "back": self._tello.move_back,
-            "left": self._tello.move_left,
-            "right": self._tello.move_right,
-            "up": self._tello.move_up,
-            "down": self._tello.move_down,
+            MoveDirection.forward: self._tello.move_forward,
+            MoveDirection.back: self._tello.move_back,
+            MoveDirection.left: self._tello.move_left,
+            MoveDirection.right: self._tello.move_right,
+            MoveDirection.up: self._tello.move_up,
+            MoveDirection.down: self._tello.move_down,
         }
         fn = method_map[direction]
         await self.execute(fn, distance_cm)
         await self._broadcast_command_log(
-            "move", {"direction": direction, "distance_cm": distance_cm}, "ok"
+            "move", {"direction": direction.value, "distance_cm": distance_cm}, "ok"
         )
-        return {"ok": True, "message": f"Moved {direction} {distance_cm}cm"}
+        return {"ok": True, "message": f"Moved {direction.value} {distance_cm}cm"}
 
     # -- Rotation --
 
-    async def rotate(self, direction: str, angle_deg: int) -> dict:
+    async def rotate(self, direction: RotateDirection, angle_deg: int) -> dict:
         self._require_connected()
         self._require_flying()
-        if direction == "cw":
+        if direction == RotateDirection.cw:
             await self.execute(self._tello.rotate_clockwise, angle_deg)
         else:
             await self.execute(self._tello.rotate_counter_clockwise, angle_deg)
         await self._broadcast_command_log(
-            "rotate", {"direction": direction, "angle_deg": angle_deg}, "ok"
+            "rotate", {"direction": direction.value, "angle_deg": angle_deg}, "ok"
         )
-        return {"ok": True, "message": f"Rotated {direction} {angle_deg}°"}
+        return {"ok": True, "message": f"Rotated {direction.value} {angle_deg}°"}
 
     # -- Video streaming --
 
@@ -419,32 +418,31 @@ class DroneManager:
                 "barometer": 0.0, "tof_distance": 0,
             }
         t = self._tello
-        (
-            battery, height, flight_time, temp_high, temp_low,
-            pitch, roll, yaw, speed_x, speed_y, speed_z,
-            barometer, tof,
-        ) = await asyncio.gather(
-            asyncio.to_thread(t.get_battery),
-            asyncio.to_thread(t.get_height),
-            asyncio.to_thread(t.get_flight_time),
-            asyncio.to_thread(t.get_highest_temperature),
-            asyncio.to_thread(t.get_lowest_temperature),
-            asyncio.to_thread(t.get_pitch),
-            asyncio.to_thread(t.get_roll),
-            asyncio.to_thread(t.get_yaw),
-            asyncio.to_thread(t.get_speed_x),
-            asyncio.to_thread(t.get_speed_y),
-            asyncio.to_thread(t.get_speed_z),
-            asyncio.to_thread(t.get_barometer),
-            asyncio.to_thread(t.get_distance_tof),
-        )
-        return {
-            "battery": battery, "height": height, "flight_time": flight_time,
-            "temperature": {"high": temp_high, "low": temp_low},
-            "attitude": {"pitch": pitch, "roll": roll, "yaw": yaw},
-            "speed": {"x": speed_x, "y": speed_y, "z": speed_z},
-            "barometer": barometer, "tof_distance": tof,
-        }
+
+        def _read_all() -> dict:
+            return {
+                "battery": t.get_battery(),
+                "height": t.get_height(),
+                "flight_time": t.get_flight_time(),
+                "temperature": {
+                    "high": t.get_highest_temperature(),
+                    "low": t.get_lowest_temperature(),
+                },
+                "attitude": {
+                    "pitch": t.get_pitch(),
+                    "roll": t.get_roll(),
+                    "yaw": t.get_yaw(),
+                },
+                "speed": {
+                    "x": t.get_speed_x(),
+                    "y": t.get_speed_y(),
+                    "z": t.get_speed_z(),
+                },
+                "barometer": t.get_barometer(),
+                "tof_distance": t.get_distance_tof(),
+            }
+
+        return await asyncio.to_thread(_read_all)
 
     # -- Guards --
 

@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { Camera, Settings, LogOut } from 'lucide-react';
 import { useDroneStore } from '@/stores/droneStore';
 import * as api from '@/lib/api';
+import { pad, batteryTextColor } from '@/lib/format';
 
 const STATUS_DOT_CLASS: Record<string, string> = {
   connected: 'bg-ok',
@@ -9,10 +10,6 @@ const STATUS_DOT_CLASS: Record<string, string> = {
   disconnected: 'bg-hud-dim',
   error: 'bg-danger',
 };
-
-function pad(n: number): string {
-  return String(n).padStart(2, '0');
-}
 
 export default function StatusBar() {
   const connectionStatus = useDroneStore((s) => s.connectionStatus);
@@ -58,7 +55,7 @@ export default function StatusBar() {
       {battery !== null && !previewMode && (
         <>
           <span className="w-px h-4 bg-white/10" />
-          <span className={`font-mono text-hud-sm ${battery <= 20 ? 'text-danger' : battery <= 50 ? 'text-caution' : 'text-ok'}`}>
+          <span className={`font-mono text-hud-sm ${batteryTextColor(battery)}`}>
             {battery}%
           </span>
         </>

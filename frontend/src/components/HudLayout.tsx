@@ -51,7 +51,7 @@ export default function HudLayout() {
         isOpen={sequenceModalOpen}
         onClose={() => setSequenceModalOpen(false)}
         onSelect={(id) => {
-          sendCommand(() => api.runSequence(id), `RUN SEQUENCE ${id}`);
+          sendCommand(() => api.runSequence(id));
         }}
       />
     </>

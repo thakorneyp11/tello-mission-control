@@ -54,7 +54,7 @@ interface DroneStore {
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   enterPreview: () => void;
-  sendCommand: (commandFn: () => Promise<ApiResponse>, label: string) => Promise<boolean>;
+  sendCommand: (commandFn: () => Promise<ApiResponse>) => Promise<boolean>;
 }
 
 export const useDroneStore = create<DroneStore>((set, get) => ({
@@ -163,7 +163,7 @@ export const useDroneStore = create<DroneStore>((set, get) => ({
   },
 
   // Generic command wrapper — prevents double-sends
-  sendCommand: async (commandFn, _label) => {
+  sendCommand: async (commandFn) => {
     if (get().commandPending) return false;
 
     set({ commandPending: true });

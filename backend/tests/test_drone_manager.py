@@ -2,6 +2,7 @@ import asyncio
 
 import pytest
 
+from app.models.commands import MoveDirection, RotateDirection
 from app.services.drone_manager import (
     DroneManager,
     DroneNotConnectedError,
@@ -105,43 +106,43 @@ async def test_emergency_when_not_connected(dm):
 @pytest.mark.asyncio
 async def test_move_requires_connected(dm):
     with pytest.raises(DroneNotConnectedError):
-        await dm.move("forward", 100)
+        await dm.move(MoveDirection.forward, 100)
 
 
 @pytest.mark.asyncio
 async def test_move_requires_flying(dm):
     await dm.connect()
     with pytest.raises(DroneNotFlyingError):
-        await dm.move("forward", 100)
+        await dm.move(MoveDirection.forward, 100)
 
 
 @pytest.mark.asyncio
 async def test_move_all_directions(dm):
     await dm.connect()
     await dm.takeoff()
-    for direction in ["forward", "back", "left", "right", "up", "down"]:
+    for direction in MoveDirection:
         result = await dm.move(direction, 50)
         assert result["ok"] is True
-        assert direction in result["message"]
+        assert direction.value in result["message"]
 
 
 @pytest.mark.asyncio
 async def test_rotate_cw_and_ccw(dm):
     await dm.connect()
     await dm.takeoff()
-    result_cw = await dm.rotate("cw", 90)
+    result_cw = await dm.rotate(RotateDirection.cw, 90)
     assert result_cw["ok"] is True
-    result_ccw = await dm.rotate("ccw", 180)
+    result_ccw = await dm.rotate(RotateDirection.ccw, 180)
     assert result_ccw["ok"] is True
 
 
 @pytest.mark.asyncio
 async def test_rotate_requires_connected_and_flying(dm):
     with pytest.raises(DroneNotConnectedError):
-        await dm.rotate("cw", 90)
+        await dm.rotate(RotateDirection.cw, 90)
     await dm.connect()
     with pytest.raises(DroneNotFlyingError):
-        await dm.rotate("cw", 90)
+        await dm.rotate(RotateDirection.cw, 90)
 
 
 @pytest.mark.asyncio
@@ -185,7 +186,7 @@ async def test_get_telemetry_after_takeoff(dm):
 async def test_get_telemetry_after_rotation(dm):
     await dm.connect()
     await dm.takeoff()
-    await dm.rotate("cw", 90)
+    await dm.rotate(RotateDirection.cw, 90)
     telemetry = await dm.get_telemetry()
     assert telemetry["attitude"]["yaw"] == 90
 
