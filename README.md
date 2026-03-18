@@ -6,6 +6,11 @@ A locally-deployed web application for controlling a DJI Tello drone via browser
 Browser (React) ←HTTP/WS→ FastAPI + djitellopy ←UDP→ DJI Tello (192.168.10.1)
 ```
 
+<img width="800" alt="Tello Web Controller Interface" src="https://github.com/user-attachments/assets/9ba9d593-b2ef-4b7d-b769-9882847af1cb">
+
+Demo video: https://youtube.com/shorts/Ex-KBuxlEQw
+
+
 ## Prerequisites
 
 - Python 3.12+
